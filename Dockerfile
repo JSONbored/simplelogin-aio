@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1@sha256:2780b5c3bab67f1f76c781860de469442999ed1a0d7992a5efdf2cffc0e3d769
 # checkov:skip=CKV_DOCKER_3: s6-overlay requires root init for bundled services before daemons drop privileges
-ARG UPSTREAM_VERSION=v4.81.4
-ARG UPSTREAM_IMAGE_DIGEST=sha256:a665457b007270bc19350447c0a5404fc96b906dc2ce60b1291c9152f07b1b70
+ARG UPSTREAM_VERSION=v4.81.6
+ARG UPSTREAM_IMAGE_DIGEST=sha256:3abf622d85fbcb090566927c94733ad1a9b1edb215e3a1db61c1e2c116229ee5
 FROM jsonbored/aio-base:s6-3.2.1.0@sha256:07db479a01a95ba28480b4605f5d1cc8bedb574b77cf167ee46e29b9558fee90 AS aio-base
 
 FROM simplelogin/app-ci:${UPSTREAM_VERSION}@${UPSTREAM_IMAGE_DIGEST}
