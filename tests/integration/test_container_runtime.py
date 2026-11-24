@@ -49,12 +49,14 @@ def test_happy_path_boot_and_restart(runtime: DockerRuntime) -> None:
         container.wait_for_smtp()
         assert container.path_exists("/appdata/postgres/PG_VERSION")  # nosec B101
         assert container.path_exists("/appdata/sl/.initialized")  # nosec B101
-        assert container.exec("openssl rsa -in /dkim.key -pubout").stdout == public_key  # nosec B101
+        assert (
+            container.exec("openssl rsa -in /dkim.key -pubout").stdout == public_key
+        )  # nosec B101
         assert container.exec("head -n 1 /dkim.key").stdout.strip() == (  # nosec B101
             "-----BEGIN RSA PRIVATE KEY-----"
         )
         container.exec(
-            'queue=$(postconf -h queue_directory) && '
+            "queue=$(postconf -h queue_directory) && "
             'cmp /etc/resolv.conf "$queue/etc/resolv.conf" && '
             'cmp /etc/ssl/certs/ca-certificates.crt "$queue/etc/ssl/certs/ca-certificates.crt"'
         )
