@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v4.83.6-aio.1 - 2026-11-24
+
+### Fixes
+
+- Update SimpleLogin to 4.83.6 and repair mail startup (#204)
+
 ## v4.81.4-aio.1 - 2026-06-18
 
 ### Maintenance
