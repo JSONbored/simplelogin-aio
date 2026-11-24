@@ -29,7 +29,7 @@ if [[ -z ${DB_URI_VALUE} ]]; then
 			echo "Unable to locate PostgreSQL binaries under /usr/lib/postgresql."
 			exit 1
 		fi
-		su -s /bin/bash postgres -c "${PG_BIN_DIR}/initdb --auth-local=peer --auth-host=scram-sha-256 -D /appdata/postgres"
+		su -s /bin/bash postgres -c "${PG_BIN_DIR}/initdb --encoding=UTF8 --locale=C.UTF-8 --auth-local=peer --auth-host=scram-sha-256 -D /appdata/postgres"
 
 		INTERNAL_PG_PASS=$(openssl rand -hex 24)
 		printf '%s\n' "${INTERNAL_PG_PASS}" >/appdata/postgres/.sl_internal_pass

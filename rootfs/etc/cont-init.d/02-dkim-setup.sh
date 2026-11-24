@@ -41,7 +41,7 @@ else
 	echo -e "${YELLOW}No DKIM keys found. Generating new 2048-bit RSA key pair...${NC}"
 
 	# Generate private key
-	if ! openssl genrsa -out "${PRIVATE_KEY}" 2048 2>/dev/null; then
+	if ! openssl genrsa -traditional -out "${PRIVATE_KEY}" 2048 2>/dev/null; then
 		echo -e "${RED}[ERROR] Failed to generate DKIM private key!${NC}"
 		exit 1
 	fi
@@ -84,6 +84,17 @@ fi
 if [[ -L ${PRIVATE_KEY} ]]; then
 	echo -e "${RED}[ERROR] Refusing to update permissions on symlinked DKIM private key at ${PRIVATE_KEY}.${NC}"
 	exit 1
+fi
+# dkimpy reads PKCS#1. Convert an older OpenSSL 3 key in place while retaining
+# the DNS public key. Replace the original only after OpenSSL verifies the copy.
+if grep -qx -- '-----BEGIN PRIVATE KEY-----' "${PRIVATE_KEY}"; then
+	converted_key="$(mktemp "${DKIM_DIR}/.dkim.XXXXXXXX")"
+	trap 'rm -f -- "${converted_key}"' EXIT
+	openssl rsa -in "${PRIVATE_KEY}" -traditional -out "${converted_key}"
+	openssl rsa -in "${converted_key}" -check -noout >/dev/null
+	chown simplelogin:simplelogin "${converted_key}"
+	mv -f -- "${converted_key}" "${PRIVATE_KEY}"
+	trap - EXIT
 fi
 chmod 600 "${PRIVATE_KEY}"
 chown simplelogin:simplelogin "${PRIVATE_KEY}"

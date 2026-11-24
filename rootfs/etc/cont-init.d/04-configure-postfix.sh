@@ -84,6 +84,16 @@ if [[ ! -f /etc/ssl/private/ssl-cert-snakeoil.key ]] || [[ ! -f /etc/ssl/certs/s
 		-out /etc/ssl/certs/ssl-cert-snakeoil.pem >/dev/null 2>&1
 fi
 
+# Debian runs Postfix services in a chroot. Refresh its resolver and public
+# trust roots on every start, including when Docker assigns new DNS settings.
+queue_dir="$(postconf -h queue_directory)"
+install -d "${queue_dir}/etc" "${queue_dir}/etc/ssl/certs"
+for resolver_file in resolv.conf hosts nsswitch.conf; do
+	install -m 0644 "/etc/${resolver_file}" "${queue_dir}/etc/${resolver_file}"
+done
+install -m 0644 /etc/ssl/certs/ca-certificates.crt "${queue_dir}/etc/ssl/certs/ca-certificates.crt"
+postconf -e "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"
+
 postconf -e "compatibility_level = 2"
 postconf -e "myhostname = mail.${EMAIL_DOMAIN}"
 postconf -e "mydomain = ${EMAIL_DOMAIN}"
